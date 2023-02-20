@@ -29,6 +29,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         setupLayout()
+        test()
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -47,7 +48,20 @@ class ViewController: UIViewController {
             $0.height.equalTo(33)
         }
     }
-
+    
+    func test() {
+        NetworkService.shared.request(endPoint: .random) { (result: Result<Giphy, GiphyError>) in
+            //(result: Result<Images, GiphyError>) in
+            
+            switch result {
+            case .success(let result):
+                print("success: \(result)")
+                
+            case .failure(let error):
+                print("error: \(error)")
+            }
+        }
+    }
 
 }
 

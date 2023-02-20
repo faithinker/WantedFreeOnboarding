@@ -17,6 +17,9 @@
 		05CEC3F829A3062C00FE8594 /* UIButton+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CEC3F729A3062C00FE8594 /* UIButton+.swift */; };
 		05CEC3FB29A307F200FE8594 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 05CEC3FA29A307F200FE8594 /* SnapKit */; };
 		05CEC3FD29A3123000FE8594 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CEC3FC29A3123000FE8594 /* ImageCell.swift */; };
+		05E5DED129A336A000A67A97 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 05E5DED029A336A000A67A97 /* README.md */; };
+		05E5DED429A33C3300A67A97 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5DED329A33C3200A67A97 /* NetworkService.swift */; };
+		05E5DED729A3408800A67A97 /* RandomModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E5DED629A3408800A67A97 /* RandomModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +34,9 @@
 		05CEC3F529A304DE00FE8594 /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		05CEC3F729A3062C00FE8594 /* UIButton+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+.swift"; sourceTree = "<group>"; };
 		05CEC3FC29A3123000FE8594 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
+		05E5DED029A336A000A67A97 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		05E5DED329A33C3200A67A97 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		05E5DED629A3408800A67A97 /* RandomModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,8 +70,11 @@
 		05CEC3DB29A2FC3800FE8594 /* Concurrency */ = {
 			isa = PBXGroup;
 			children = (
+				05E5DED029A336A000A67A97 /* README.md */,
 				05CEC3F229A303D500FE8594 /* Foundation */,
 				05CEC3F129A300E200FE8594 /* Feature */,
+				05E5DED529A3406A00A67A97 /* Model */,
+				05E5DED229A33AF300A67A97 /* Network */,
 				05CEC3F029A2FFCD00FE8594 /* Supporting Files */,
 			);
 			path = Concurrency;
@@ -100,6 +109,22 @@
 				05CEC3F729A3062C00FE8594 /* UIButton+.swift */,
 			);
 			path = Foundation;
+			sourceTree = "<group>";
+		};
+		05E5DED229A33AF300A67A97 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				05E5DED329A33C3200A67A97 /* NetworkService.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		05E5DED529A3406A00A67A97 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05E5DED629A3408800A67A97 /* RandomModel.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,6 +191,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05E5DED129A336A000A67A97 /* README.md in Resources */,
 				05CEC3E929A2FC3900FE8594 /* LaunchScreen.storyboard in Resources */,
 				05CEC3E629A2FC3900FE8594 /* Assets.xcassets in Resources */,
 			);
@@ -180,9 +206,11 @@
 			files = (
 				05CEC3F429A303DA00FE8594 /* Then.swift in Sources */,
 				05CEC3F829A3062C00FE8594 /* UIButton+.swift in Sources */,
+				05E5DED429A33C3300A67A97 /* NetworkService.swift in Sources */,
 				05CEC3E129A2FC3800FE8594 /* ViewController.swift in Sources */,
 				05CEC3DD29A2FC3800FE8594 /* AppDelegate.swift in Sources */,
 				05CEC3DF29A2FC3800FE8594 /* SceneDelegate.swift in Sources */,
+				05E5DED729A3408800A67A97 /* RandomModel.swift in Sources */,
 				05CEC3FD29A3123000FE8594 /* ImageCell.swift in Sources */,
 				05CEC3F629A304DE00FE8594 /* UIView+.swift in Sources */,
 			);
