@@ -13,7 +13,6 @@ class ImageCell: UITableViewCell {
     static let identifier = String(describing: ImageCell.self)
         
     private lazy var picture = UIImageView().then {
-        $0.backgroundColor = .yellow
         $0.image = UIImage(systemName: "photo")
         $0.contentMode = .scaleAspectFit
     }
@@ -71,6 +70,5 @@ class ImageCell: UITableViewCell {
     
     func configure(_ data: UIImage?) {
         picture.image = data
-        picture.backgroundColor = .red
     }
 }

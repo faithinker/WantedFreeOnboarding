@@ -22,15 +22,18 @@ class NetworkService {
     
     enum EndPoint {
         case random
+        case trend(limit: Int)
         
         var path: String {
             switch self {
             case .random:       return "gifs/random"
+            case .trend:        return "gifs/trending"
             }
         }
         
         var query: [String: AnyHashable] {
             switch self {
+            case .trend(let limit):            return ["limit" : limit]
             default:
                 return [:]
             }

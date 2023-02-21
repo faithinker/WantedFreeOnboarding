@@ -8,10 +8,14 @@
 import UIKit
 
 
+struct GiphyTrend: Codable {
+    let data: [GiphyData]
+    let meta: Meta
+}
+
 struct Giphy: Codable {
     let data: GiphyData
     let meta: Meta
-    
 }
 struct GiphyData: Codable {
     let type: String

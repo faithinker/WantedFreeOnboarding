@@ -14,6 +14,8 @@ class ViewController: UIViewController {
     
     private var cancellables: Set<AnyCancellable> = []
     
+    private var images = [UIImage?]()
+    
     private lazy var tableView = UITableView().then {
         $0.backgroundColor = .systemBlue
         $0.separatorStyle = .none
@@ -53,7 +55,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func loadImage(_ row: Int) {
+    private func loadImage(_ row: Int, _ totalImage: Bool = false) {
         NetworkService.shared.request(endPoint: .random) { [weak self] (result: Result<Giphy, GiphyError>) in
             guard let `self` = self else { return }
             
@@ -73,15 +75,37 @@ class ViewController: UIViewController {
                     cell.configure(UIImage(data: imageData))
                 }
             case .failure(let error):
-                print("error: \(error)")
+                print("error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func loadAllData(_ count: Int) {
+        NetworkService.shared.request(endPoint: .trend(limit: count)) { [weak self] (result : Result<GiphyTrend, GiphyError>) in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let result):
+                self.images = []
+                
+                result.data.forEach {
+                    guard let imageData = try? Data(contentsOf: URL(string: $0.images.fixedHeightSmallStill.url)!) else { return }
+                    self.images.append(UIImage(data: imageData))
+                }
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            case .failure(let error):
+                print("error: \(error.localizedDescription)")
             }
         }
     }
     
     private func bind() {
         loadAllButton.tapPublisher
-            .sink(receiveValue: { _ in
-                print("button Tapped")
+            .sink(receiveValue: { [weak self]  _ in
+                guard let self else { return }
+                self.loadAllData(5)
             })
             .store(in: &cancellables)
     }
@@ -89,6 +113,8 @@ class ViewController: UIViewController {
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // 재사용 셀을 쓰게 될 경우, load 버튼을 누르면 이벤트가 두번 불린다.
+        //guard let cell = tableView.dequeueReusableCell(withIdentifier: ImageCell.identifier) as? ImageCell else { return ImageCell() }
         
         let cell = ImageCell()
         
@@ -100,12 +126,9 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             })
             .store(in: &cancellables)
         
-//        imageData.publisher
-//            .sink { image in
-//
-//                print("count", image?.images?.count)
-//                cell.configure(image)
-//            }.store(in: &cancellables)
+        if !images.isEmpty {
+            cell.configure(images[indexPath.row])
+        }
         
         return cell
     }
