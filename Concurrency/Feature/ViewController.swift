@@ -55,7 +55,8 @@ class ViewController: UIViewController {
         }
     }
     
-    private func loadImage(_ row: Int, _ totalImage: Bool = false) {
+    /// 구 버전 GCD방식
+    private func loadImage(_ index: IndexPath, _ totalImage: Bool = false) {
         NetworkService.shared.request(endPoint: .random) { [weak self] (result: Result<Giphy, GiphyError>) in
             guard let `self` = self else { return }
             
@@ -70,13 +71,25 @@ class ViewController: UIViewController {
                 }
                 
                 DispatchQueue.main.async {
-                    guard let cell = self.tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ImageCell else { return }
+                    guard let cell = self.tableView.cellForRow(at: index) as? ImageCell else { return }
                     
                     cell.configure(UIImage(data: imageData))
                 }
             case .failure(let error):
                 print("error: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    /// 신 버전 Async-Await 버전
+    private func loadAsyncTask(_ index: IndexPath) {
+        Task {
+            let randomUrl = "https://api.giphy.com/v1/gifs/random?api_key=0qkSNtNaUL0XRhFBY7ov2q8VEC2FVAFy"
+            let imageData = try await NetworkService.shared.downloadImage(url: randomUrl)
+            
+            guard let cell = self.tableView.cellForRow(at: index) as? ImageCell else { return }
+            
+            cell.configure(imageData)
         }
     }
     
@@ -122,7 +135,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
                 print("cell button Tapped \(indexPath.row)")
-                self.loadImage(indexPath.row)
+                //self.loadImage(indexPath)
+                self.loadAsyncTask(indexPath)
             })
             .store(in: &cancellables)
         

@@ -94,14 +94,25 @@ class NetworkService {
         
     }
     
-    
-    func downloadImage(url: URL) async throws -> UIImage {
+    func downloadImage(url: String) async throws -> UIImage {
+        guard let url = URL(string: url) else { throw GiphyError.invalidUrl }
+        
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            print("jhkim First Url Response Error!!")
             throw GiphyError.invalidResponse
         }
         
-        guard let image = UIImage(data: data) else {
+        guard let imageUrl = try URL(string:JSONDecoder().decode(Giphy.self, from: data).data.images.fixedHeightSmallStill.url) else { throw GiphyError.jsonDecoderFail }
+        
+        let (imageData, imageResponse) = try await URLSession.shared.data(from: imageUrl)
+        
+        guard let response = imageResponse as? HTTPURLResponse, response.statusCode == 200 else {
+            print("jhkim Second Url Response Error!!")
+            throw GiphyError.invalidResponse
+        }
+        
+        guard let image = UIImage(data: imageData) else {
             throw GiphyError.invalidData
         }
         return image
