@@ -91,8 +91,18 @@ class NetworkService {
         
     }
     
-
-
+    
+    func downloadImage(url: URL) async throws -> UIImage {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw GiphyError.invalidResponse
+        }
+        
+        guard let image = UIImage(data: data) else {
+            throw GiphyError.invalidData
+        }
+        return image
+    }
 }
 
 

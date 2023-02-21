@@ -6,12 +6,12 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
-
 
 class ImageCell: UITableViewCell {
     static let identifier = String(describing: ImageCell.self)
-    
+        
     private lazy var picture = UIImageView().then {
         $0.backgroundColor = .yellow
         $0.image = UIImage(systemName: "photo")
@@ -28,7 +28,7 @@ class ImageCell: UITableViewCell {
         $0.layer.cornerRadius = 4
     }
     
-    private lazy var loadButton = UIButton().then {
+    lazy var loadButton = UIButton().then {
         $0.layer.cornerRadius = 10
         $0.setTitle("Load", for: .normal)
         $0.setBackgroundColor(.systemBlue, for: .normal)
@@ -69,7 +69,8 @@ class ImageCell: UITableViewCell {
         }
     }
     
-    func configure(_ data: UIImage) {
+    func configure(_ data: UIImage?) {
         picture.image = data
+        picture.backgroundColor = .red
     }
 }

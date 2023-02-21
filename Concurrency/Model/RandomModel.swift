@@ -5,7 +5,7 @@
 //  Created by jhkim on 2023/02/20.
 //
 
-import Foundation
+import UIKit
 
 
 struct Giphy: Codable {

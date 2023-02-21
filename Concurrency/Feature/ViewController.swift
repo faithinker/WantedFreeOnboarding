@@ -6,9 +6,13 @@
 //
 
 import UIKit
+import Combine
+import CombineCocoa
 import SnapKit
 
 class ViewController: UIViewController {
+    
+    private var cancellables: Set<AnyCancellable> = []
     
     private lazy var tableView = UITableView().then {
         $0.backgroundColor = .systemBlue
@@ -29,7 +33,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         setupLayout()
-        test()
+        bind()
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -49,26 +53,60 @@ class ViewController: UIViewController {
         }
     }
     
-    func test() {
-        NetworkService.shared.request(endPoint: .random) { (result: Result<Giphy, GiphyError>) in
-            //(result: Result<Images, GiphyError>) in
+    func loadImage(_ row: Int) {
+        NetworkService.shared.request(endPoint: .random) { [weak self] (result: Result<Giphy, GiphyError>) in
+            guard let `self` = self else { return }
             
             switch result {
             case .success(let result):
-                print("success: \(result)")
+                guard let imageUrl = URL(string:result.data.images.fixedHeightSmallStill.url) else {
+                    print("Url Error"); return
+                }
                 
+                guard let imageData = try? Data(contentsOf: imageUrl) else {
+                    print("Data Error: \(imageUrl)"); return
+                }
+                
+                DispatchQueue.main.async {
+                    guard let cell = self.tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ImageCell else { return }
+                    
+                    cell.configure(UIImage(data: imageData))
+                }
             case .failure(let error):
                 print("error: \(error)")
             }
         }
     }
-
+    
+    private func bind() {
+        loadAllButton.tapPublisher
+            .sink(receiveValue: { _ in
+                print("button Tapped")
+            })
+            .store(in: &cancellables)
+    }
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = ImageCell()
+        
+        cell.loadButton.tapPublisher
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                print("cell button Tapped \(indexPath.row)")
+                self.loadImage(indexPath.row)
+            })
+            .store(in: &cancellables)
+        
+//        imageData.publisher
+//            .sink { image in
+//
+//                print("count", image?.images?.count)
+//                cell.configure(image)
+//            }.store(in: &cancellables)
+        
         return cell
     }
     
