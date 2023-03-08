@@ -11,25 +11,27 @@ import SnapKit
 
 class ImageCell: UITableViewCell {
     static let identifier = String(describing: ImageCell.self)
-        
+    
+    public var setValue: Float {
+        get {
+            return 0
+        }
+        set {
+            progressView.progress = newValue
+        }
+    }
+    
     private lazy var picture = UIImageView().then {
         $0.image = UIImage(systemName: "photo")
         $0.contentMode = .scaleAspectFit
     }
     
-    private lazy var progressBar = UIView().then {
-        $0.backgroundColor = .systemGray
-        $0.layer.cornerRadius = 4
-    }
-    
-    private lazy var gageBar = UIView().then {
-        $0.backgroundColor = .systemBlue
-        $0.layer.cornerRadius = 4
-    }
+    private lazy var progressView = UIProgressView()
     
     lazy var loadButton = UIButton().then {
         $0.layer.cornerRadius = 10
         $0.setTitle("Load", for: .normal)
+        $0.setTitle("Stop", for: .selected)
         $0.setBackgroundColor(.systemBlue, for: .normal)
         $0.setBackgroundColor(.white.withAlphaComponent(0.5), for: .highlighted)
     }
@@ -40,7 +42,7 @@ class ImageCell: UITableViewCell {
     }
     
     private func setupLayout() {
-        addSubViews([picture, progressBar, gageBar, loadButton])
+        addSubViews([picture, progressView, loadButton])
         
         picture.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -48,20 +50,14 @@ class ImageCell: UITableViewCell {
             $0.height.equalTo(75)
             $0.width.equalTo(130)
         }
-        progressBar.snp.makeConstraints {
+        progressView.snp.makeConstraints {
             $0.leading.equalTo(picture.snp.trailing).offset(10)
             $0.centerY.equalTo(picture.snp.centerY)
             $0.height.equalTo(4)
             $0.width.equalTo(120)
         }
-        gageBar.snp.makeConstraints {
-            $0.leading.equalTo(picture.snp.trailing).offset(10)
-            $0.centerY.equalTo(picture.snp.centerY)
-            $0.height.equalTo(4)
-            $0.width.equalTo(60)
-        }
         loadButton.snp.makeConstraints {
-            $0.leading.equalTo(progressBar.snp.trailing).offset(10)
+            $0.leading.equalTo(progressView.snp.trailing).offset(10)
             $0.centerY.equalTo(picture.snp.centerY)
             $0.height.equalTo(35)
             $0.width.equalTo(75)

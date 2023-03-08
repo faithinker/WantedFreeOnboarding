@@ -13,7 +13,6 @@ import SnapKit
 class ViewController: UIViewController {
     
     private var cancellables: Set<AnyCancellable> = []
-    
     private var images = [UIImage?]()
     
     private lazy var tableView = UITableView().then {
@@ -27,6 +26,7 @@ class ViewController: UIViewController {
     private lazy var loadAllButton = UIButton().then {
         $0.layer.cornerRadius = 10
         $0.setTitle("Load All Images", for: .normal)
+        $0.setTitle("Stop", for: .selected)
         $0.setBackgroundColor(.systemBlue, for: .normal)
         $0.setBackgroundColor(.white.withAlphaComponent(0.5), for: .highlighted)
     }
@@ -56,10 +56,10 @@ class ViewController: UIViewController {
     }
     
     /// 구 버전 GCD방식
-    private func loadImage(_ index: IndexPath, _ totalImage: Bool = false) {
-        NetworkService.shared.request(endPoint: .random) { [weak self] (result: Result<Giphy, GiphyError>) in
-            guard let `self` = self else { return }
-            
+    private func loadImage(_ index: IndexPath, _ totalImage: Bool = false, isStop: Bool = false) {
+        guard let cell = self.tableView.cellForRow(at: index) as? ImageCell else { return }
+        
+        NetworkService.shared.request(endPoint: .random, cancelTask: isStop) { (result: Result<Giphy, GiphyError>) in
             switch result {
             case .success(let result):
                 guard let imageUrl = URL(string:result.data.images.fixedHeightSmallStill.url) else {
@@ -71,12 +71,16 @@ class ViewController: UIViewController {
                 }
                 
                 DispatchQueue.main.async {
-                    guard let cell = self.tableView.cellForRow(at: index) as? ImageCell else { return }
-                    
                     cell.configure(UIImage(data: imageData))
+                    cell.loadButton.isSelected = false
                 }
+                
             case .failure(let error):
                 print("error: \(error.localizedDescription)")
+            }
+        } value: { data in
+            DispatchQueue.main.async {
+                cell.setValue = data
             }
         }
     }
@@ -93,8 +97,9 @@ class ViewController: UIViewController {
         }
     }
     
+    // 랜덤(API)을 5번 찌르는 반복문으로 바꿔야 한다.
     private func loadAllData(_ count: Int) {
-        NetworkService.shared.request(endPoint: .trend(limit: count)) { [weak self] (result : Result<GiphyTrend, GiphyError>) in
+        NetworkService.shared.request(endPoint: .trend(limit: count), cancelTask: false) { [weak self] (result : Result<GiphyTrend, GiphyError>) in
             guard let self else { return }
             
             switch result {
@@ -106,10 +111,20 @@ class ViewController: UIViewController {
                     self.images.append(UIImage(data: imageData))
                 }
                 DispatchQueue.main.async {
+                    self.loadAllButton.isSelected = false
                     self.tableView.reloadData()
                 }
             case .failure(let error):
                 print("error: \(error.localizedDescription)")
+            }
+        } value: { [weak self] data in
+            guard let self else { return }
+            
+            DispatchQueue.main.async {
+                for i in 0..<5 {
+                    guard let cell = self.tableView.cellForRow(at: IndexPath(row: i, section: 0)) as? ImageCell else { return }
+                    cell.setValue = data
+                }
             }
         }
     }
@@ -119,6 +134,7 @@ class ViewController: UIViewController {
             .sink(receiveValue: { [weak self]  _ in
                 guard let self else { return }
                 self.loadAllData(5)
+                self.loadAllButton.isSelected = !self.loadAllButton.isSelected
             })
             .store(in: &cancellables)
     }
@@ -135,8 +151,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
                 print("cell button Tapped \(indexPath.row)")
-                //self.loadImage(indexPath)
-                self.loadAsyncTask(indexPath)
+                cell.loadButton.isSelected = !cell.loadButton.isSelected
+                self.loadImage(indexPath, isStop: !cell.loadButton.isSelected)
+                //self.loadAsyncTask(indexPath)
+                
             })
             .store(in: &cancellables)
         

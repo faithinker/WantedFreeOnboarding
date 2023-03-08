@@ -11,7 +11,14 @@ import UIKit
 
 class NetworkService {
     static let shared = NetworkService()
+    public var observation: NSKeyValueObservation!
+    private var task: URLSessionDataTask!
     private init() { }
+    
+    deinit {
+        observation.invalidate()
+        observation = nil
+    }
     
     private let API_Key = "0qkSNtNaUL0XRhFBY7ov2q8VEC2FVAFy"
     
@@ -50,7 +57,7 @@ class NetworkService {
         }
     }
     
-    func request<T: Decodable>(endPoint: EndPoint, completion: @escaping(Result<T, GiphyError>) -> Void) {
+    func request<T: Decodable>(endPoint: EndPoint, cancelTask: Bool ,completion: @escaping(Result<T, GiphyError>) -> Void, value: @escaping(Float) -> Void) {
         
         guard let relativeUrl = URL(string: endPoint.path, relativeTo: baseUrl) else {
             completion(.failure(.invalidUrl)); return
@@ -75,7 +82,12 @@ class NetworkService {
         
         print("Request URL: \(componentUrl.absoluteString)")
         
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        if cancelTask {
+            task.cancel()
+            return
+        }
+        
+        task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let _ =  error { completion(.failure(.responseError)); return }
                         
             guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { completion(.failure(.invalidResponse)); return }
@@ -84,14 +96,18 @@ class NetworkService {
             
             do {
                 let decodedResponse = try JSONDecoder().decode(T.self, from: data)
-                
                 completion(.success(decodedResponse))
             } catch {
                 completion(.failure(.jsonDecoderFail))
             }
         }
-        task.resume()
         
+        observation = task.progress.observe(\.fractionCompleted, options: .new, changeHandler: { progress, change in
+            value(Float(progress.fractionCompleted))
+            print("진행상태 : \(Float(progress.fractionCompleted))")
+        })
+        
+        task.resume()
     }
     
     func downloadImage(url: String) async throws -> UIImage {
