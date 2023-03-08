@@ -10,7 +10,7 @@
 
 [https://developer.apple.com/videos/play/wwdc2021/10132/](https://developer.apple.com/videos/play/wwdc2021/10132/)
 
-한국어
+한국어 &nbsp;
 [https://engineering.linecorp.com/ko/blog/about-swift-concurrency](https://engineering.linecorp.com/ko/blog/about-swift-concurrency)
 
 
@@ -61,7 +61,6 @@ func request<T: Decodable>(endPoint: EndPoint, completion: @escaping(Result<T, G
 }
 ```
 
-
 ---------
 &nbsp;
 &nbsp;
@@ -84,6 +83,8 @@ Task {
 
 &nbsp;
 &nbsp;
+&nbsp;
+
 함수 리턴값 앞에 async와 throws 키워드를 붙여 호출부에서 에러 처리를 하도록 하고
 URL Request를 할 때는 try await 키워드를 사용하여 Async의 콜백을 기다린다.(대기한다.)
 그리고 Response 값으로 실패한다면 throw를 통해 에러를 던져준다.
